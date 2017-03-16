@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration scan="true">
+
+   <property scope="context" name="logback.file.path" value="logs/" />
+
+   <appender name="R" class="ch.qos.logback.core.FileAppender">
+       <file>${logback.file.path:-}system.log</file>
+       <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>DENY</onMatch>
+            <onMismatch>ACCEPT</onMismatch>
+        </filter>
+       <encoder>
+          <pattern>%d{dd MMM yyyy HH:mm:ss} %-5level [%t] %logger{36}:%L - %msg%n</pattern>
+       </encoder>
+   </appender>
+
+    <appender name="con" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>DENY</onMatch>
+            <onMismatch>ACCEPT</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36}:%L - %msg%n</pattern> 
+        </encoder>
+    </appender>
+
+    <appender name="conInfo" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>%msg%n</pattern> 
+        </encoder>
+    </appender>
+   
+    <root level="info">
+        <appender-ref ref="con" />
+        <appender-ref ref="conInfo" />
+        <appender-ref ref="R" />
+    </root>
+  
+    <logger name="de" level="info"/>
+
+</configuration>
