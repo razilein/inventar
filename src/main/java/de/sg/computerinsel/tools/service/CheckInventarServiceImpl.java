@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 
@@ -33,6 +34,10 @@ public class CheckInventarServiceImpl implements CheckInventarService {
         final Collection<File> files = listFiles();
         final List<Ware> waren = getWaren(files);
         final List<Ware> fehlendeWaren = getFehlendeWaren(waren);
+        if (log.isDebugEnabled()) {
+            logFehlendeWaren(fehlendeWaren);
+        }
+        copyFehlendeWaren(fehlendeWaren);
     }
 
     private Collection<File> listFiles() {
@@ -43,7 +48,8 @@ public class CheckInventarServiceImpl implements CheckInventarService {
         final List<Ware> waren = new ArrayList<>();
         for (final File file : files) {
             try {
-                waren.add(new Ware(FileUtils.readLines(file)));
+                final Ware ware = new Ware(FileUtils.readLines(file), file);
+                waren.add(ware);
             } catch (final IOException e) {
                 log.info("Datei '{}' konnte nicht verarbeitet werden.", file.getAbsolutePath());
                 log.debug(e.getMessage(), e);
@@ -56,7 +62,25 @@ public class CheckInventarServiceImpl implements CheckInventarService {
     }
 
     private List<Ware> getFehlendeWaren(final List<Ware> waren) {
-        return null;
+        return waren.stream().filter(w -> !inventarSearchService.existsWareByEan(w)).collect(Collectors.toList());
+    }
+
+    private void copyFehlendeWaren(final List<Ware> fehlendeWaren) {
+        final File directoryFehlendeWaren = new File(directory, "FehlendeWaren");
+        for (final Ware ware : fehlendeWaren) {
+            try {
+                FileUtils.copyFile(ware.getDatei(), new File(directoryFehlendeWaren, ware.getDatei().getName()));
+            } catch (final IOException e) {
+                log.error("Fehler beim Schreiben der Datei {} : {} {}", ware.getDatei().getAbsolutePath(), e.getMessage(), e);
+            }
+        }
+    }
+
+    private void logFehlendeWaren(final List<Ware> fehlendeWaren) {
+        log.debug("Folgende Waren konnten nicht gefunden werden:");
+        for (final Ware ware : fehlendeWaren) {
+            log.debug(ware.toString());
+        }
     }
 
 }

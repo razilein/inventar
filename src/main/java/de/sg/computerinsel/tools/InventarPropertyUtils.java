@@ -28,6 +28,8 @@ public class InventarPropertyUtils {
 
     public static final String PROP_PW = "password";
 
+    private static final String PROP_PATH_CHROMEDRIVER = "path.chromedriver";
+
     public static Properties loadSettings() {
         Properties props = null;
         try (final FileReader reader = new FileReader(new File(FilenameUtils.concat(FOLDER_PROPERTIES, FILENAME_PROPERTIES)))) {
@@ -51,5 +53,9 @@ public class InventarPropertyUtils {
 
     public static String getUrl(final Properties properties) {
         return properties.getProperty(PROP_URL);
+    }
+
+    public static String getPathChromedriver(final Properties properties) {
+        return properties.getProperty(PROP_PATH_CHROMEDRIVER);
     }
 }
