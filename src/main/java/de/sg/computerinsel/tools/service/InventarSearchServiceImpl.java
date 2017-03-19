@@ -59,12 +59,16 @@ public class InventarSearchServiceImpl implements InventarSearchService {
         driver.get(InventarPropertyUtils.getUrl(settings) + "&search=" + ware.getEanNummer());
         waitForPageToLoad();
         final List<WebElement> list = driver.findElements(By.xpath("//*[contains(text(),'Ware konnte nicht gefunden werden!')]"));
-        return list.isEmpty() ? checkSpalteErn(ware) : false;
+        final boolean exists = list.isEmpty() ? checkSpalteErn(ware) : false;
+        if (!exists) {
+            log.info("{} existiert nicht in Inventar.", ware);
+        }
+        return exists;
     }
 
     private void waitForPageToLoad() {
         try {
-            Thread.sleep(3000L);
+            Thread.sleep(1000L);
         } catch (final InterruptedException e) {
             log.error(e.getMessage(), e);
         }

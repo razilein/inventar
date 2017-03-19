@@ -50,12 +50,15 @@ public class CheckInventarServiceImpl implements CheckInventarService {
             try {
                 final Ware ware = new Ware(FileUtils.readLines(file), file);
                 waren.add(ware);
+                log.info("Ware gefunden: {}", ware);
             } catch (final IOException e) {
                 log.info("Datei '{}' konnte nicht verarbeitet werden.", file.getAbsolutePath());
                 log.debug(e.getMessage(), e);
+                copyFehlendeWare(file);
             } catch (final IllegalArgumentException e) {
                 log.info("Datei '{}' konnte nicht verarbeitet werden, da die Anzahl der in der Datei enthaltenen Werte ungültig ist.",
                         file.getAbsolutePath());
+                copyFehlendeWare(file);
             }
         }
         return waren;
@@ -66,14 +69,21 @@ public class CheckInventarServiceImpl implements CheckInventarService {
     }
 
     private void copyFehlendeWaren(final List<Ware> fehlendeWaren) {
-        final File directoryFehlendeWaren = new File(directory, "FehlendeWaren");
         for (final Ware ware : fehlendeWaren) {
-            try {
-                FileUtils.copyFile(ware.getDatei(), new File(directoryFehlendeWaren, ware.getDatei().getName()));
-            } catch (final IOException e) {
-                log.error("Fehler beim Schreiben der Datei {} : {} {}", ware.getDatei().getAbsolutePath(), e.getMessage(), e);
-            }
+            copyFehlendeWare(ware);
         }
+    }
+
+    private void copyFehlendeWare(final Ware ware) {
+        try {
+            FileUtils.copyFile(ware.getDatei(), new File(new File(directory, "FehlendeWaren"), ware.getDatei().getName()));
+        } catch (final IOException e) {
+            log.error("Fehler beim Schreiben der Datei {} : {} {}", ware.getDatei().getAbsolutePath(), e.getMessage(), e);
+        }
+    }
+
+    private void copyFehlendeWare(final File datei) {
+        copyFehlendeWare(new Ware(datei));
     }
 
     private void logFehlendeWaren(final List<Ware> fehlendeWaren) {
