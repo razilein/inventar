@@ -24,9 +24,15 @@ public class InventarPropertyUtils {
 
     public static final String PROP_URL = "url";
 
+    public static final String PROP_PILOT_URL = "pilot.url";
+
     public static final String PROP_USER = "user";
 
+    public static final String PROP_PILOT_USER = "pilot.user";
+
     public static final String PROP_PW = "password";
+
+    public static final String PROP_PILOT_PW = "pilot.password";
 
     private static final String PROP_PATH_CHROMEDRIVER = "path.chromedriver";
 
@@ -57,5 +63,17 @@ public class InventarPropertyUtils {
 
     public static String getPathChromedriver(final Properties properties) {
         return properties.getProperty(PROP_PATH_CHROMEDRIVER);
+    }
+
+    public static String getPilotUsername(final Properties properties) {
+        return properties.getProperty(PROP_PILOT_USER);
+    }
+
+    public static String getPilotPassword(final Properties properties) {
+        return properties.getProperty(PROP_PILOT_PW);
+    }
+
+    public static String getPilotUrl(final Properties properties) {
+        return properties.getProperty(PROP_PILOT_URL);
     }
 }

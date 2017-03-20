@@ -46,4 +46,7 @@ public class Ware {
         name = datei.getName();
     }
 
+    public Ware() {
+    }
+
 }
