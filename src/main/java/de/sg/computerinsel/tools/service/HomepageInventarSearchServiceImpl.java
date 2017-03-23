@@ -1,7 +1,6 @@
 package de.sg.computerinsel.tools.service;
 
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
@@ -16,47 +15,33 @@ import lombok.extern.slf4j.Slf4j;
  * @author Sita Geßner
  */
 @Slf4j
-public class InventarSearchServiceImpl implements InventarSearchService {
+public class HomepageInventarSearchServiceImpl extends BaseInventarSearchServiceImpl implements InventarSearchService {
 
-    private final Properties settings;
-
-    private ChromeDriver driver;
-
-    public InventarSearchServiceImpl() {
-        this.settings = InventarPropertyUtils.loadSettings();
-        init();
-        login();
-        checkLogin();
+    public HomepageInventarSearchServiceImpl() {
+        super();
     }
 
-    private void init() {
+    @Override
+    protected void init() {
         setChromeDriverPath();
         driver = new ChromeDriver();
         driver.get(InventarPropertyUtils.getUrl(settings));
     }
 
-    private void login() {
-        final WebElement fieldUsername = driver.findElement(By.name("user_name"));
-        final WebElement fieldPassword = driver.findElement(By.name("password"));
-
-        fieldUsername.sendKeys(InventarPropertyUtils.getUsername(settings));
-        fieldPassword.sendKeys(InventarPropertyUtils.getPassword(settings));
-
-        driver.findElement(By.name("login")).click();
+    @Override
+    protected void login() {
+        login(By.name("user_name"), By.name("password"), By.name("login"), InventarPropertyUtils.getUsername(settings),
+                InventarPropertyUtils.getPassword(settings));
     }
 
-    private void checkLogin() {
-        try {
-            driver.findElement(By.name("search"));
-            log.debug("Login erfolgreich");
-        } catch (final Exception e) {
-            log.error("Login nicht erfolgreich: {}, {}", e.getMessage(), e);
-        }
+    @Override
+    protected void checkLogin() {
+        checkLogin(By.name("search"));
     }
 
     @Override
     public boolean existsWareByEan(final Ware ware) {
-        driver.get(InventarPropertyUtils.getUrl(settings) + "&search=" + ware.getEanNummer());
+        driver.get(InventarPropertyUtils.getUrl(settings) + ware.getEanNummer());
         waitForPageToLoad();
         final List<WebElement> list = driver.findElements(By.xpath("//*[contains(text(),'Ware konnte nicht gefunden werden!')]"));
         final boolean exists = list.isEmpty() ? checkSpalteErn(ware) : false;
@@ -64,15 +49,6 @@ public class InventarSearchServiceImpl implements InventarSearchService {
             log.info("{} existiert nicht in Inventar.", ware);
         }
         return exists;
-    }
-
-    private void waitForPageToLoad() {
-        try {
-            Thread.sleep(1000L);
-        } catch (final InterruptedException e) {
-            log.error(e.getMessage(), e);
-        }
-
     }
 
     private boolean checkSpalteErn(final Ware ware) {
@@ -88,14 +64,6 @@ public class InventarSearchServiceImpl implements InventarSearchService {
             }
         }
         return containsCompleteErn;
-    }
-
-    private void setChromeDriverPath() {
-        System.setProperty("webdriver.chrome.driver", InventarPropertyUtils.getPathChromedriver(settings));
-    }
-
-    public Properties getSettings() {
-        return settings;
     }
 
 }

@@ -18,11 +18,13 @@ public class Start {
         if (args == null || args.length == 0) {
             log.error("Es wurde kein Pfad angegeben.");
         } else {
+            final Modus modus = Modus.getModusByCode(args.length > 1 ? args[1] : null);
+            log.info("Modus: {}", modus);
             final File dir = new File(args[0]);
             if (!dir.exists() || dir.isFile()) {
                 log.error("Das angegebene Verzeichnis ist ungültig.");
             } else {
-                checkInventar = new CheckInventarServiceImpl(dir);
+                checkInventar = new CheckInventarServiceImpl(dir, modus);
                 checkInventar.start();
             }
         }
